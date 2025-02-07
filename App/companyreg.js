@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc,setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -26,6 +26,9 @@ document.getElementById('signinButton').addEventListener('click', async function
   const clogo = document.getElementById('clogo').value; // Get additional string input
   const email = sessionStorage.getItem('email');
 
+
+
+
   // Ensure user is logged in
   const triggerShake = (input) => {
     input.classList.remove('shake');
@@ -42,6 +45,9 @@ document.getElementById('signinButton').addEventListener('click', async function
   try {
     // Store Data in Firestore
     const companyRef = doc(db, "company", cname);
+    const crdoc=await getDoc(companyRef);
+
+    if(!crdoc.exists()){
     const companyDetails = {
       Name: cname,
       clogo: clogo,  // Store the string input as description
@@ -52,7 +58,9 @@ document.getElementById('signinButton').addEventListener('click', async function
 
     sessionStorage.setItem('company', cname);
     window.location.href="/company/chome.html";
-
+  }else{
+      document.getElementById('info').innerHTML="Company Already Registered in Orbit..!";
+  }
   } catch (error) {
     console.error("Error:", error);
     alert("Registration failed: " + error.message);
