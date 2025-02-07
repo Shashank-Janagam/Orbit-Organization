@@ -49,7 +49,14 @@ if (!userUID) {
     alert(error);
   }
  
+  document.getElementById('memployee').addEventListener('click', async (e) => {
+    window.location.href="memployee.html";
+  });
+  document.getElementById('managers').addEventListener('click', async (e) => {
+    window.location.href="managers.html";
+  });
   // Display the user details...
 }
+  
 
 
