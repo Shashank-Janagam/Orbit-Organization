@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Acme&family=Dancing+Script:wght@400..700&family=Edu+VIC+WA+NT+Beginner:wght@400..700&family=Goldman:wght@400;700&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Monomaniac+One&family=Pacifico&family=Permanent+Marker&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="/Images/icon.png">
+  <link rel="stylesheet" href="empstyle.css">
+  <link rel="stylesheet" href="check.css">
 
   
   <link rel="stylesheet" href="home.css">
@@ -78,11 +80,21 @@
     </div>
     
 </div>
+<div class="e1">
 
+  <input type="empid" placeholder="Enter Manager ID" id="empid" required>
+  <div id="search" >
+      <img id="rocket" src="/Images/shuttle.png" alt="Search">
+  </div>
+  <div class="warning-msg" id="warning-msg">
+    <i class="fa fa-warning"></i> <img id="cross" src="/Images/cross.png" alt=""> No Manager Found....!
+  </div>
 <div id="header">
     <div id="addemp">
         Add Manager
     </div>
+</div>
+
 </div>
 
 <div id="empd">
@@ -105,6 +117,44 @@
         </form>
     </div>
 </div>
+
+
+<div class="portion">
+  <div class="holder">
+   <div id="epm">
+   <p  style="font-size: 1.2rem;
+   font-weight: bold;
+   color: #333;
+   list-style-type: none;
+   /* margin-left: 0px; */
+   padding-left: 1%;">Managers List</p>
+   </div>
+   <ul id="employeeList">
+       <!-- Employees will be listed here -->
+   </ul>
+   </div>
+<!-- <div class="profile" id="profile" > -->
+ <div class="profile" id="profile" style="display: none;">
+     <!-- <p id="profiledetails">Profile</p> -->
+   <!-- <p id="profiledetails">Profile</p> -->
+   <img id="userPhoto" src="" style="display: none;"  width="100%" />
+   <p id="userName"></p>
+            <p class="profiledetails"><span class="users" id="Role"></span></p>
+
+   <p class="profiledetails"><span  class="users" id="company"></span></p>
+
+   <p class="profiledetails"><span  class="users" id="userEmail"></span></p>
+   <p class="profiledetails"><span  class="users" id="Dob"></span></p>
+
+   <p class="profiledetails"><span  class="users" id="userMobile"></span></p>
+   
+   
+ </div>
+ 
+ 
+</div>
+</div>
+
 <script  type="module" src="managers.js"></script>
 </body>
 </html>

@@ -32,13 +32,41 @@ async function handleSignIn(){
 
     if(queryshot.empty){
 
+      const allowedUsersRef = collection(db, 'allowedUsers');
+    const allowedmanagerRef=collection(db,'allowedManagers');
 
-      sessionStorage.setItem('email',user.email);
+    const q = query(allowedUsersRef, where('uid', '==', user.email.replace("@gmail.com", "")));
+    const p = query(allowedmanagerRef, where('uid','==', user.email.replace("@gmail.com","")));
+    const querySnapshot = await getDocs(q);
+    const pmanagers= await getDocs(p);
+
+
+    if (!querySnapshot.empty || !pmanagers.empty) {
+      // alert("Hello");
+      try {
+        await signOut(auth); // Sign out the user
+        console.log("User successfully logged out.");
+        
+        // Clear sessionStorage        
+        // Redirect to the login page
+        window.location.href = "/index.html";
+      } catch (error) {
+        console.error("Error during logout:", error);
+        alert("Logout failed. Please try again.");
+      }
+
+      window.location.href="notuser.html";
+      return;
+    }else{sessionStorage.setItem('email',user.email);
       sessionStorage.setItem('userUID',user.uid);
-      window.location.href="companyreg.html";
+      window.location.href="companyreg.html";}
+
+
+      
       
 
     }else{
+      
       
       const cdocs=queryshot.docs[0];
       const cdata=cdocs.data();

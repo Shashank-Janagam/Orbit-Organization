@@ -30,6 +30,7 @@ if (!userUID) {
   alert("Please sign in to proceed.");
   window.location.href = "/index.html"; // Redirect to login page
 } else {
+
   console.log("User is authenticated with UID:", userUID);
 
  const company=sessionStorage.getItem('company');
