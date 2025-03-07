@@ -57,8 +57,9 @@ if (!userUID) {
     const role = document.getElementById('role').value.trim();
     const dob = document.getElementById('dob').value.trim();
     const mobile = document.getElementById('mobile').value.trim();
+    const dep=document.getElementById('department').value.trim();
 
-    if (!email || !role || !dob || !mobile) {
+    if (!email || !role || !dob || !mobile ||!dep) {
       alert("All fields are required!");
       return;
     }
@@ -77,6 +78,7 @@ if (!userUID) {
           Role: role,
           Dob: dob,
           mobile: mobile,
+          department:dep,
         });
         document.getElementById('info').style.color="#04AA6D";
 
@@ -149,7 +151,7 @@ async function displayAllEmployees() {
     const company = sessionStorage.getItem('company');
     
     try {
-      const usersCollection = collection(db, `/company/${company}/managers`);
+      const usersCollection = collection(db, `/company/${company}`);
       const querySnapshot = await getDocs(usersCollection);
   
       if (!querySnapshot.empty) {
