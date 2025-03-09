@@ -43,6 +43,7 @@
     font-weight: bold;
     color: #525050;
     list-style-type: none;
+    cursor: pointer;
     /* margin-left: 0px; */
     /* padding-left: 1%; */
 
@@ -97,7 +98,46 @@
     height: 50%;
     width: 10%;
   }
+  .profile-img{
+    border-radius: 50%;
+  }
+  .user-name{
+    text-align: center;
+    font-family: arial;
+    font-weight: bold;
 
+  }
+  #emps{
+    /* padding-top: 10%; */
+    /* display: flex; */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    /* max-width:70%; */
+    /* display: none; */
+    overflow: scroll;
+    scrollbar-width:none;
+    height: 700px;
+    width: 25%;
+    /* margin: auto; */
+    margin-left: 1%;
+    margin-top: 0px;
+    text-align: center;
+    font-family: arial;
+    background-color: #fff;
+    /* padding: 20px; */
+    padding-top: 0px;
+
+    margin-top:3.5%;
+ 
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out; /* For smooth transition */
+    object-fit: cover;
+
+    overflow: scroll;
+    height: auto;
+    display: flex;
+    transition: opacity 0.5s ease; /* Smooth fade effect */
+
+  }
 
   #profile {
     /* padding-top: 10%; */
@@ -129,6 +169,16 @@
     transition: opacity 0.5s ease; /* Smooth fade effect */
 
   }
+  .userPhoto1{
+    border-radius: 8px;
+    margin-top: 5px;
+    margin-left:5px;
+    height: 150px;
+    /* background-color: #525050; */
+    cursor: pointer;
+
+  }
+ 
   #userPhoto {
     width: 100%;
     height: auto;

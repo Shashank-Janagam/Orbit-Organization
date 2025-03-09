@@ -28,11 +28,13 @@ if (!userUID) {
 } else {
     
     document.getElementById('addemp').addEventListener('click', () => {
+      document.getElementById('info').textContent = "";
+
         let empd = document.getElementById('empd');
         empd.style.display = "flex"; // Ensure it's visible
         empd.style.opacity = "0"; 
         empd.style.transform = "scale(0.95)"; // Slight shrink for smooth effect
-    
+
         setTimeout(() => {
             empd.style.opacity = "1"; 
             empd.style.transform = "scale(1)"; // Normal size
@@ -160,11 +162,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 // Fetch and display all employees with their roles
-async function displayAllEmployees() {
+async function DisplayDepartments() {
     const company = sessionStorage.getItem('company');
     
     try {
-      const usersCollection = collection(db, `/company/${company}/users`);
+      const usersCollection = collection(db, `/company/${company}/Departments`);
       const querySnapshot = await getDocs(usersCollection);
   
       if (!querySnapshot.empty) {
@@ -173,18 +175,17 @@ async function displayAllEmployees() {
   
         querySnapshot.forEach(doc => {
           const employeeData = doc.data();
-          const employeeName = employeeData.name || "Not provided";
-          const employeeRole = employeeData.Role || "Not provided";
+          const dname = employeeData.department || "Not provided";
   
           // Create a new list item for each employee
           const li = document.createElement('li');
-          li.textContent = `${employeeName} - ${employeeRole}`;
+          li.textContent = `${dname}`;
           employeeList.appendChild(li);
   
           // You can also add a click handler here to load the employee's profile when clicked
           li.addEventListener('click', () => {
-            displayEmployeeProfile(employeeData);
-          });
+            displayEmployeesInDepartment(company, dname);
+        });
         });
       } else {
         console.log("No employees found.");
@@ -193,7 +194,57 @@ async function displayAllEmployees() {
       console.error("Error fetching employees:", error);
     }
   }
-  
+  async function displayEmployeesInDepartment(company, department) {
+    try {
+        const employeesCollection = collection(db, `/company/${company}/${department}/${department}/Employees`);
+        const querySnapshot = await getDocs(employeesCollection);
+
+        const employeeContainer = document.getElementById('emps'); 
+        employeeContainer.innerHTML = ''; // Clear previous data
+        employeeContainer.style.display = 'flex';
+        employeeContainer.style.flexWrap = 'wrap'; // Allow multiple elements in a row
+        employeeContainer.style.gap = '15px'; // Add spacing between elements
+        
+        if (!querySnapshot.empty) {
+            querySnapshot.forEach(doc => {
+                const employeeData = doc.data();
+                const employeeName = employeeData.name || "Unknown Employee";
+                const photoURL = employeeData.photoURL || "/Images/default-profile-pic.png"; // Default image
+
+                // Create the userPhoto container
+                const userPhotoDiv = document.createElement('div');
+                userPhotoDiv.classList.add('userPhoto1');
+
+                // Create an image element inside userPhoto
+                const img = document.createElement('img');
+                img.src = photoURL;
+                img.alt = `${employeeName}'s Photo`;
+                img.classList.add('profile-img');
+
+                // Create a name label
+                const nameLabel = document.createElement('p');
+                nameLabel.classList.add('user-name');
+                nameLabel.textContent = employeeName;
+
+                // Append elements to userPhoto div
+                userPhotoDiv.appendChild(img);
+                userPhotoDiv.appendChild(nameLabel);
+                userPhotoDiv.addEventListener('click', () => {
+                  displayEmployeesProfile(employeeData);
+                });
+
+
+                // Append userPhoto div to the main profile container
+                employeeContainer.appendChild(userPhotoDiv);
+            });
+        } else {
+            employeeContainer.innerHTML = "<p>No employees found in this department.</p>";
+        }
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+    }
+}
+
   // Search functionality for employee (same as before)
   const search = document.getElementById("search");
   search.addEventListener('click', async () => {
@@ -237,7 +288,7 @@ async function displayAllEmployees() {
   });
   
   // Function to display employee profile details (same as before)
-  function displayEmployeeProfile(data) {
+  function displayEmployeesProfile(data) {
     const imgElement = document.getElementById('userPhoto');
     
     // Set the image source to the fetched URL
@@ -265,8 +316,8 @@ async function displayAllEmployees() {
     
   }
   
-  // Call displayAllEmployees when the page loads to show all employees
+  // Call Display Departments when the page loads to show all employees
   document.addEventListener("DOMContentLoaded", function() {
-    displayAllEmployees();
+    DisplayDepartments();
   });
   

@@ -133,7 +133,7 @@ body, html {
         #con{
           border-radius: 8px;
           width: 15%;
-          height: 100%;
+          height: 60%;
         }
         #companylogo {
           height: 150px;
@@ -569,7 +569,7 @@ cursor: pointer;
 #box {
   background-color: #ddd;
   width: 20%;
-  height: 550px;
+  height: 600px;
   padding: 20px;
   border-radius: 15px;
   display: flex;

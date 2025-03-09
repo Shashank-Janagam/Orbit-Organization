@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore, collection,doc,setDoc, query, where, orderBy,getDocs,getDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { getFirestore, collection,doc,setDoc, deleteDoc,query, where, orderBy,getDocs,getDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCib5ywnEJvXXIePdWeKZtrKMIi2-Q_9sM",
@@ -27,6 +27,8 @@ if (!userUID) {
 } else {
     
     document.getElementById('addemp').addEventListener('click', () => {
+      document.getElementById('info').textContent = "";
+
         let empd = document.getElementById('empd');
         empd.style.display = "flex"; // Ensure it's visible
         empd.style.opacity = "0"; 
@@ -47,58 +49,76 @@ if (!userUID) {
             empd.style.display = "none"; // Hide after animation
         }, 400); // Match transition duration
     });
-    
-
-  document.getElementById('submit').addEventListener('click', async (e) => {
-    e.preventDefault(); // Prevent form submission from reloading the page
-
-    const company = sessionStorage.getItem('company');
-    const email = document.getElementById('email').value.trim();
-    const role = document.getElementById('role').value.trim();
-    const dob = document.getElementById('dob').value.trim();
-    const mobile = document.getElementById('mobile').value.trim();
-    const dep=document.getElementById('department').value.trim();
-
-    if (!email || !role || !dob || !mobile ||!dep) {
-      alert("All fields are required!");
-      return;
-    }
-
-    const userId = email.split('@')[0]; // More flexible approach than replacing "@gmail.com"
-    const cref = doc(db, 'allowedManagers', userId);
-    
-    try {
-      const cdoc = await getDoc(cref);
-
-      if (!cdoc.exists()) {
-        await setDoc(cref, {
-          uid: userId,
-          email: email,
-          company: company || "Unknown",
-          Role: role,
-          Dob: dob,
-          mobile: mobile,
-          department:dep,
-        });
-        document.getElementById('info').style.color="#04AA6D";
-
-        document.getElementById('info').textContent = "Registered";
-
-        setTimeout(() => {
-          document.getElementById("empd").style.display = "none";
-          document.querySelector('form').reset(); // Clear form after submission
-        }, 2000);
-      } else {
-        document.getElementById('info').textContent = "Manager Already Registered in Orbit"; // Reset button text
-        setTimeout(() => {
-            document.getElementById("empd").style.display = "none";
-            document.querySelector('form').reset(); // Clear form after submission
-          }, 2000);
+    document.getElementById('submit').addEventListener('click', async (e) => {
+      e.preventDefault(); // Prevent form submission from reloading the page
+  
+      const company = sessionStorage.getItem('company');
+      const email = document.getElementById('email').value.trim();
+      const dob = document.getElementById('dob').value.trim();
+      const mobile = document.getElementById('mobile').value.trim();
+      const dep = document.getElementById('department').value.trim();
+  
+      if (!email || !dob || !mobile || !dep) {
+          alert("All fields are required!");
+          return;
       }
-    } catch (error) {
-      console.error("Error adding employee:", error);
-    }
+  
+      const managersRef = collection(db, 'allowedManagers');
+      const querySnapshot = await getDocs(query(managersRef, where("department", "==", dep)));
+  
+      if (!querySnapshot.empty) {
+          const existingManager = querySnapshot.docs[0].data();
+          const existingEmail = existingManager.email;
+  
+          // Prompt user for overwrite
+          const overwrite = confirm(`A manager (${existingEmail}) already exists for this department. Do you want to overwrite?`);
+          if (!overwrite) {
+              return; // Stop if the user does not want to overwrite
+          } else {
+              await deleteDoc(doc(db, 'allowedManagers', existingManager.uid));
+              console.log(`Deleted previous manager: ${existingEmail}`);
+          }
+      }
+  
+      const userId = email.split('@')[0];
+      const cref = doc(db, 'allowedManagers', userId);
+      const depRef = doc(db, `company/${company}/Departments`, dep);
+      const depSnap = await getDoc(depRef);  
+      try {
+          // Check if the department exists in Departments collection
+          if (!depSnap.exists()) {
+            await setDoc(depRef, {
+                department: dep,
+                company: company || "Unknown",
+                createdAt: new Date(),
+            });
+        }
+        
+  
+          // Register new manager
+          await setDoc(cref, {
+              uid: userId,
+              email: email,
+              company: company || "Unknown",
+              Role: "Manager",
+              Dob: dob,
+              mobile: mobile,
+              department: dep,
+          });
+  
+          document.getElementById('info').style.color = "#04AA6D";
+          document.getElementById('info').textContent = "Registered";
+  
+          setTimeout(() => {
+              document.getElementById("empd").style.display = "none";
+              document.querySelector('form').reset();
+          }, 2000);
+  
+      } catch (error) {
+          console.error("Error adding employee:", error);
+      }
   });
+    
 }
 };
 
@@ -147,11 +167,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 // Fetch and display all employees with their roles
-async function displayAllEmployees() {
+async function DisplayDepartments() {
     const company = sessionStorage.getItem('company');
     
     try {
-      const usersCollection = collection(db, `/company/${company}`);
+      const usersCollection = collection(db, `/company/${company}/Departments`);
       const querySnapshot = await getDocs(usersCollection);
   
       if (!querySnapshot.empty) {
@@ -160,17 +180,16 @@ async function displayAllEmployees() {
   
         querySnapshot.forEach(doc => {
           const employeeData = doc.data();
-          const employeeName = employeeData.name || "Not provided";
-          const employeeRole = employeeData.Role || "Not provided";
+          const employeeName = employeeData.department || "Not provided";
   
           // Create a new list item for each employee
           const li = document.createElement('li');
-          li.textContent = `${employeeName} - ${employeeRole}`;
+          li.textContent = `${employeeName}`;
           employeeList.appendChild(li);
   
           // You can also add a click handler here to load the employee's profile when clicked
           li.addEventListener('click', () => {
-            displayEmployeeProfile(employeeData);
+            displayEmployeeProfile(employeeData.department);
           });
         });
       } else {
@@ -201,14 +220,14 @@ async function displayAllEmployees() {
     try {
       const company = sessionStorage.getItem('company');
       // Fetch employee details from 'users' collection by EmployeeID
-      const usersCollection = collection(db, `/company/${company}/managers`);
+      const usersCollection = doc(db, `/company/${company}`);
       const q = query(usersCollection, where("EmployeeID", "==", EmployeeID));
       const querySnapshot = await getDocs(q);
   
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0].data(); // Assume the first result is the correct one
         // Display the selected employee's details in the profile form
-        displayEmployeeProfile(doc);
+        displayEmployeeProfile(doc.department);
       } else {
         // alert("Employee not found.");
         const warningBox = document.getElementById("warning-msg");
@@ -224,7 +243,19 @@ async function displayAllEmployees() {
   });
   
   // Function to display employee profile details (same as before)
-  function displayEmployeeProfile(data) {
+  async function displayEmployeeProfile(dep) {
+    const company =sessionStorage.getItem('company');
+    const managerRef = doc(db, `company/${company}/${dep}/${dep}`);
+    const managerDoc = await getDoc(managerRef);
+
+      if (!managerDoc.exists()) {
+          alert("Manager not found!");
+          return;
+      }
+
+    const data = managerDoc.data();
+
+
     const imgElement = document.getElementById('userPhoto');
     
     // Set the image source to the fetched URL
@@ -252,8 +283,8 @@ async function displayAllEmployees() {
     
   }
   
-  // Call displayAllEmployees when the page loads to show all employees
+  // Call DisplayDepartments when the page loads to show all employees
   document.addEventListener("DOMContentLoaded", function() {
-    displayAllEmployees();
+    DisplayDepartments();
   });
   
