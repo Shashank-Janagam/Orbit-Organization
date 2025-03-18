@@ -82,11 +82,13 @@ if (!userUID) {
   
       const userId = email.split('@')[0];
       const cref = doc(db, 'allowedManagers', userId);
+      const cref1 = doc(db, 'allowedUsers', userId);
       const depRef = doc(db, `company/${company}/Departments`, dep);
       const depSnap = await getDoc(depRef);  
+      const depSnap1=await getDoc(cref1);
       try {
           // Check if the department exists in Departments collection
-          if (!depSnap.exists()) {
+          if (!depSnap.exists() && !depSnap1.exists()) {
             await setDoc(depRef, {
                 department: dep,
                 company: company || "Unknown",

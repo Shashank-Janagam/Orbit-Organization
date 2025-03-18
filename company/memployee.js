@@ -78,11 +78,14 @@ if (!userUID) {
 
     const userId = email.split('@')[0]; // More flexible approach than replacing "@gmail.com"
     const cref = doc(db, 'allowedUsers', userId);
+    const cref1 = doc(db, 'allowedManagers', userId);
+
     
     try {
       const cdoc = await getDoc(cref);
+      const cdoc1=await getDoc(cref1);
 
-      if (!cdoc.exists()) {
+      if (!cdoc.exists() && !cdoc1.exists()) {
         await setDoc(cref, {
           uid: userId,
           email: email,
