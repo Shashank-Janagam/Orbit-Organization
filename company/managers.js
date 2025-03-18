@@ -64,9 +64,17 @@ if (!userUID) {
       }
   
       const managersRef = collection(db, 'allowedManagers');
-      const querySnapshot = await getDocs(query(managersRef, where("department", "==", dep)));
-  
-      if (!querySnapshot.empty) {
+      const querySnapshot = await getDocs(query(managersRef, where("department", "==", dep),
+      where("company", "==", company)));
+      const userId = email.split('@')[0];
+      const cref = doc(db, 'allowedManagers', userId);
+      const cref1 = doc(db, 'allowedUsers', userId);
+      const depRef = doc(db, `company/${company}/Departments`, dep);
+      const depSnap = await getDoc(depRef);  
+      const cdoc1=await getDoc(cref1);
+      const cdoc=await getDoc(cref);
+      console.log(cdoc1.data());
+      if (!querySnapshot.empty && !cdoc.exists() && !cdoc1.exists()) {
           const existingManager = querySnapshot.docs[0].data();
           const existingEmail = existingManager.email;
   
@@ -80,15 +88,10 @@ if (!userUID) {
           }
       }
   
-      const userId = email.split('@')[0];
-      const cref = doc(db, 'allowedManagers', userId);
-      const cref1 = doc(db, 'allowedUsers', userId);
-      const depRef = doc(db, `company/${company}/Departments`, dep);
-      const depSnap = await getDoc(depRef);  
-      const depSnap1=await getDoc(cref1);
+     
       try {
           // Check if the department exists in Departments collection
-          if (!depSnap.exists() && !depSnap1.exists()) {
+          if (!depSnap.exists()) {
             await setDoc(depRef, {
                 department: dep,
                 company: company || "Unknown",
@@ -98,6 +101,8 @@ if (!userUID) {
         
   
           // Register new manager
+  if (!cdoc.exists() && !cdoc1.exists()) {
+
           await setDoc(cref, {
               uid: userId,
               email: email,
@@ -115,11 +120,19 @@ if (!userUID) {
               document.getElementById("empd").style.display = "none";
               document.querySelector('form').reset();
           }, 2000);
+        }else {
+          document.getElementById('info').textContent = "Employee Already Registered in Orbit"; // Reset button text
+          setTimeout(() => {
+              document.getElementById("empd").style.display = "none";
+              document.querySelector('form').reset(); // Clear form after submission
+            }, 2000);
+        }
   
       } catch (error) {
           console.error("Error adding employee:", error);
       }
   });
+  
     
 }
 };
