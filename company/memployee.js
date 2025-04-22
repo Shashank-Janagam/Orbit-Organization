@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore, collection,doc,setDoc, query, where, orderBy,getDocs,getDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { getFirestore, collection,doc,setDoc, query, where, orderBy,getDocs,getDoc,deleteDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -211,9 +211,9 @@ async function DisplayDepartments() {
         if (!querySnapshot.empty) {
             querySnapshot.forEach(doc => {
                 const employeeData = doc.data();
+                employeeData.uid=doc.id;
                 const employeeName = employeeData.name || "Unknown Employee";
                 const photoURL = employeeData.photoURL || "/Images/default-profile-pic.png"; // Default image
-
                 // Create the userPhoto container
                 const userPhotoDiv = document.createElement('div');
                 userPhotoDiv.classList.add('userPhoto1');
@@ -233,15 +233,17 @@ async function DisplayDepartments() {
                 userPhotoDiv.appendChild(img);
                 userPhotoDiv.appendChild(nameLabel);
                 userPhotoDiv.addEventListener('click', () => {
-                  displayEmployeesProfile(employeeData);
+                  displayEmployeesProfile(employeeData,company, department);
                 });
+
+
 
 
                 // Append userPhoto div to the main profile container
                 employeeContainer.appendChild(userPhotoDiv);
             });
         } else {
-            employeeContainer.innerHTML = "<p>No employees found in this department.</p>";
+            employeeContainer.innerHTML = "<p>No employees found in this department or employees not yet loged in.</p>";
         }
     } catch (error) {
         console.error("Error fetching employees:", error);
@@ -249,49 +251,10 @@ async function DisplayDepartments() {
 }
 
   // Search functionality for employee (same as before)
-  const search = document.getElementById("search");
-  search.addEventListener('click', async () => {
-    const EmployeeI = document.getElementById('empid');
-    const EmployeeID = EmployeeI.value;
-  
-    const triggerShake = (input) => {
-      input.classList.remove('shake');
-      void input.offsetWidth; // Trigger a reflow
-      input.classList.add('shake');
-    };
-  
-    if (!EmployeeID) {
-      triggerShake(EmployeeI);
-      return;
-    }
-  
-    try {
-      const company = sessionStorage.getItem('company');
-      // Fetch employee details from 'users' collection by EmployeeID
-      const usersCollection = collection(db, `/company/${company}/users`);
-      const q = query(usersCollection, where("EmployeeID", "==", EmployeeID));
-      const querySnapshot = await getDocs(q);
-  
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0].data(); // Assume the first result is the correct one
-        // Display the selected employee's details in the profile form
-        displayEmployeeProfile(doc);
-      } else {
-        // alert("Employee not found.");
-        const warningBox = document.getElementById("warning-msg");
-        warningBox.style.display = "block"; // Show message
-    
-        setTimeout(() => {
-            warningBox.style.display = "none"; // Hide after 3 seconds
-        }, 3000);        
-      }
-    } catch (error) {
-      console.error("Error fetching user data from Firestore:", error);
-    }
-  });
-  
+ 
   // Function to display employee profile details (same as before)
-  function displayEmployeesProfile(data) {
+  function displayEmployeesProfile(data,company, department) {
+    console.log(data.uid);
     const imgElement = document.getElementById('userPhoto');
     
     // Set the image source to the fetched URL
@@ -316,6 +279,57 @@ async function DisplayDepartments() {
   document.getElementById("userMobile").innerText = "Mobile: "+data.mobileNumber || "Not provided";
   document.getElementById("Role").innerText=data.Role|| "Not Provided";
   document.getElementById('company').innerText=data.Company|| "";
+
+
+
+  
+
+
+  const deleteBtn=document.getElementById("deleteemp");
+  // Add click event to delete employee
+  deleteBtn.addEventListener('click', async () => {
+    console.log("Delete button clicked for", data.email);
+    console.log(data.uid);
+
+    alert("Are you sure..?");
+    
+    try {
+
+      const deletedref=doc(db,`/company/${company}/${department}/${department}/Employees/`,data.uid);
+      const allowedUserRef = doc(db, 'allowedUsers', data.email.replace("@gmail.com","")); // Use email as the document ID
+      await deleteDoc(allowedUserRef); 
+      await deleteDoc(deletedref);
+      displayEmployeesInDepartment(company,department);
+
+      // await deleteDoc(data);  // Delete the employee document from Firestore
+
+      alert("Employee deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("Error deleting employee.");
+    }
+  });
+  const resetbtn=document.getElementById("reset");
+  // Add click event to delete employee
+  resetbtn.addEventListener('click', async () => {
+    console.log("reset button clicked for", data.email);
+
+    alert("Are you sure..? all biometric and face details well be removed.");
+    
+    try {
+
+      const deletedref=doc(db,`/company/${company}/${department}/${department}/Employees/`,data.uid);
+      await deleteDoc(deletedref);
+      displayEmployeesInDepartment(company,department);
+
+      // await deleteDoc(data);  // Delete the employee document from Firestore
+
+      alert("Employee reset successful");
+    } catch (error) {
+      console.error("Error resetting employee:", error);
+      alert("Error resetting employee.");
+    }
+  });
     
   }
   

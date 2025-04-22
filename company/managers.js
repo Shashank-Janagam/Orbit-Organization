@@ -216,47 +216,6 @@ async function DisplayDepartments() {
   }
   
   // Search functionality for employee (same as before)
-  const search = document.getElementById("search");
-  search.addEventListener('click', async () => {
-    const EmployeeI = document.getElementById('empid');
-    const EmployeeID = EmployeeI.value;
-  
-    const triggerShake = (input) => {
-      input.classList.remove('shake');
-      void input.offsetWidth; // Trigger a reflow
-      input.classList.add('shake');
-    };
-  
-    if (!EmployeeID) {
-      triggerShake(EmployeeI);
-      return;
-    }
-  
-    try {
-      const company = sessionStorage.getItem('company');
-      // Fetch employee details from 'users' collection by EmployeeID
-      const usersCollection = doc(db, `/company/${company}`);
-      const q = query(usersCollection, where("EmployeeID", "==", EmployeeID));
-      const querySnapshot = await getDocs(q);
-  
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0].data(); // Assume the first result is the correct one
-        // Display the selected employee's details in the profile form
-        displayEmployeeProfile(doc.department);
-      } else {
-        // alert("Employee not found.");
-        const warningBox = document.getElementById("warning-msg");
-        warningBox.style.display = "block"; // Show message
-    
-        setTimeout(() => {
-            warningBox.style.display = "none"; // Hide after 3 seconds
-        }, 3000);        
-      }
-    } catch (error) {
-      console.error("Error fetching user data from Firestore:", error);
-    }
-  });
-  
   // Function to display employee profile details (same as before)
   async function displayEmployeeProfile(dep) {
     const company =sessionStorage.getItem('company');

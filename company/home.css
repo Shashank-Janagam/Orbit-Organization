@@ -11,6 +11,8 @@ body, html {
     padding: 0;
     height: 100%;
     overflow-x: hidden;
+    background-image: url(/Images/background_in_space.webp);
+
     
     /* overflow: hidden; */
     }

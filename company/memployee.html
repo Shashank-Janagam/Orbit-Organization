@@ -15,6 +15,7 @@
   
   <link rel="stylesheet" href="home.css">
   <style>
+
     
     .orbit1{
       font-family: 'Source Sans Pro', sans-serif; /* Apply font to the entire page */
@@ -94,7 +95,7 @@
         <input class="empdetails" type="text" id="name" placeholder="Employee Name" style="outline: 0;" autocomplete="username" required>
         <input class="empdetails" type="email" id="email" placeholder="Employee Email" style="outline: 0;" autocomplete="username" required>
         <input class="empdetails" type="text" id="role" placeholder="Designation" style="outline: 0;" autocomplete="username" required>
-        <input class="empdetails" type="text" id="department" placeholder="Deepartment" style="outline: 0;" required>
+        <input class="empdetails" type="text" id="department" placeholder="Department" style="outline: 0;" required>
         <input class="empdetails" type="text" id="dob" placeholder="Date of Birth" style="outline: 0;" autocomplete="username" required>
         <input class="empdetails" type="number" id="mobile" placeholder="Mobile Number" 
         pattern="[0-9]{10}" title="Enter exactly 10 digits" required>
@@ -105,13 +106,8 @@
 
 <div class="e1">
 
-  <input type="empid" placeholder="Enter Employee ID" id="empid" required>
-  <div id="search" >
-      <img id="rocket" src="/Images/shuttle.png" alt="Search">
-  </div>
-  <div class="warning-msg" id="warning-msg">
-    <i class="fa fa-warning"></i> <img id="cross" src="/Images/cross.png" alt=""> No Employee Found....!
-  </div>
+
+
 <div id="header">
     <div id="addemp">
         Add Employee
@@ -150,6 +146,9 @@
       <p class="profiledetails"><span  class="users" id="Dob"></span></p>
   
       <p class="profiledetails"><span  class="users" id="userMobile"></span></p>
+      <button type="delete" class="delete-btn" id="reset">Reset </button>
+      <button type="delete" class="delete-btn" id="deleteemp">Remove Employee</button>
+
       
       
     </div>
